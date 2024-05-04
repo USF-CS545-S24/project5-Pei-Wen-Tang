@@ -8,8 +8,12 @@ package graph;
  */
 
 import java.awt.*;
+import java.io.*;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Graph {
     public final int EPS_DIST = 5;
@@ -27,7 +31,40 @@ public class Graph {
      */
     public void loadGraph(String filename) {
         // FILL IN CODE
+        // Add edge : SF to LA and also LA to SF !!!!!
+        this.labelsToIndices = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            // Load nodes
+            String line = br.readLine();
+            if(!line.equals("NODES")){
+                System.out.println("Illegal Input");
+            }
+            this.numNodes = Integer.parseInt(br.readLine());
+            for(int i = 0; i < this.numNodes; i++){
+                line = br.readLine();
+                String[] strs = line.split(" ");
+                labelsToIndices.put(strs[0], i);
+                addNode(new CityNode(strs[0], Double.parseDouble(strs[1]), Double.parseDouble(strs[2])));
+            }
 
+            // Load edges
+            if(!br.readLine().equals("ARCS")){
+                System.out.println("Illegal Input");
+            }
+            while((line = br.readLine()) != null){
+                String[] strs = line.split(" ");
+                int idx1 = labelsToIndices.get(strs[0]);
+                int idx2 = labelsToIndices.get(strs[1]);
+                int cost = Integer.parseInt(strs[2]);
+                addEdge(idx1, new Edge(idx2, cost));
+                addEdge(idx2, new Edge(idx1, cost));
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println();
     }
 
     /**
@@ -58,6 +95,7 @@ public class Graph {
      */
     public void addEdge(int nodeId, Edge edge) {
         // FILL IN CODE
+
     }
 
     /**
