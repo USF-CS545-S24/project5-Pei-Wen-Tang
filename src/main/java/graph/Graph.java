@@ -33,6 +33,7 @@ public class Graph {
         // FILL IN CODE
         // Add edge : SF to LA and also LA to SF !!!!!
         this.labelsToIndices = new HashMap<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             // Load nodes
             String line = br.readLine();
@@ -40,31 +41,33 @@ public class Graph {
                 System.out.println("Illegal Input");
             }
             this.numNodes = Integer.parseInt(br.readLine());
+            this.nodes = new CityNode[this.numNodes];
             for(int i = 0; i < this.numNodes; i++){
                 line = br.readLine();
                 String[] strs = line.split(" ");
-                labelsToIndices.put(strs[0], i);
+                this.labelsToIndices.put(strs[0], i);
                 addNode(new CityNode(strs[0], Double.parseDouble(strs[1]), Double.parseDouble(strs[2])));
             }
 
             // Load edges
+            this.adjacencyList = new Edge[this.numNodes];
             if(!br.readLine().equals("ARCS")){
                 System.out.println("Illegal Input");
             }
             while((line = br.readLine()) != null){
                 String[] strs = line.split(" ");
-                int idx1 = labelsToIndices.get(strs[0]);
-                int idx2 = labelsToIndices.get(strs[1]);
+                int idx1 = this.labelsToIndices.get(strs[0]);
+                int idx2 = this.labelsToIndices.get(strs[1]);
                 int cost = Integer.parseInt(strs[2]);
                 addEdge(idx1, new Edge(idx2, cost));
                 addEdge(idx2, new Edge(idx1, cost));
+                this.numEdges += 2;
             }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        System.out.println();
     }
 
     /**
@@ -76,6 +79,8 @@ public class Graph {
      */
     public void addNode(CityNode node) {
         // FILL IN CODE
+        int index = this.labelsToIndices.get(node.getCity());
+        this.nodes[index] = node;
     }
 
     /**
@@ -95,7 +100,12 @@ public class Graph {
      */
     public void addEdge(int nodeId, Edge edge) {
         // FILL IN CODE
-
+        if(this.adjacencyList[nodeId] == null){
+            this.adjacencyList[nodeId] = edge;
+        }else{
+            edge.setNext(this.adjacencyList[nodeId]);
+            this.adjacencyList[nodeId] = edge;
+        }
     }
 
     /**
