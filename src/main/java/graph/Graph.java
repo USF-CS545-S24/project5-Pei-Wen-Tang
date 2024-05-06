@@ -79,8 +79,7 @@ public class Graph {
      */
     public void addNode(CityNode node) {
         // FILL IN CODE
-        int index = this.labelsToIndices.get(node.getCity());
-        this.nodes[index] = node;
+        this.nodes[getId(node)] = node;
     }
 
     /**
@@ -114,8 +113,7 @@ public class Graph {
      * @return its integer id
      */
     public int getId(CityNode city) {
-
-        return -1; // Don't forget to change this
+        return this.labelsToIndices.get(city.getCity()); // Don't forget to change this
     }
 
     /**
@@ -129,12 +127,19 @@ public class Graph {
      */
     public Point[][] getEdges() {
         if (adjacencyList == null || adjacencyList.length == 0) {
-            // System.out.println("Adjacency list is empty. Load the graph first.");
+            //System.out.println("Adjacency list is empty. Load the graph first.");
             return null;
         }
         Point[][] edges2D = new Point[numEdges][2];
         // FILL IN CODE
-
+        for(int i = 0; i < this.adjacencyList.length; i++){
+            Edge edge = this.adjacencyList[i];
+            edges2D[i][0] = this.nodes[i].getLocation();
+            while(edge != null){
+                edges2D[i][1] = this.nodes[edge.getNeighbor()].getLocation();
+                edge = edge.getNext();
+            }
+        }
         return edges2D;
     }
 
@@ -178,11 +183,13 @@ public class Graph {
      * @return array where each element is an array of 2 points
      */
     public Point[][] getPath(List<Integer> pathOfNodes) {
-        int i = 0;
         Point[][] edges2D = new Point[pathOfNodes.size()-1][2];
         // Each "edge" is an array of size two (one Point is origin, one Point is destination)
         // FILL IN CODE
-
+        for(int i = 0; i < pathOfNodes.size() - 1; i++){
+            edges2D[i][0] = this.nodes[pathOfNodes.get(i)].getLocation();
+            edges2D[i][1] = this.nodes[pathOfNodes.get(i + 1)].getLocation();
+        }
         return edges2D;
     }
 
