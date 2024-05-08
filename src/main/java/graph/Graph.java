@@ -132,11 +132,15 @@ public class Graph {
         }
         Point[][] edges2D = new Point[numEdges][2];
         // FILL IN CODE
+        int n = 0;
         for(int i = 0; i < this.adjacencyList.length; i++){
             Edge edge = this.adjacencyList[i];
-            edges2D[i][0] = this.nodes[i].getLocation();
+            Point v1 = this.nodes[i].getLocation();
             while(edge != null){
-                edges2D[i][1] = this.nodes[edge.getNeighbor()].getLocation();
+                Point v2 = this.nodes[edge.getNeighbor()].getLocation();
+                edges2D[n][0] = v1;
+                edges2D[n][1] = v2;
+                n++;
                 edge = edge.getNext();
             }
         }
