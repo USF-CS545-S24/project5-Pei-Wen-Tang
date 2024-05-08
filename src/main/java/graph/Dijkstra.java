@@ -13,6 +13,124 @@ public class Dijkstra {
     private Graph graph; // stores the graph of CityNode-s and edges connecting them
     private List<Integer> shortestPath = null; // nodes that are part of the shortest path
 
+    private int[][] dijkstraTable;
+
+    private static class PriorityQueue{
+        private int[] positions;
+        private int[] distances;
+        private int size;
+        private int capacity;
+
+        public PriorityQueue(int maxSize){
+            this.size = 0;
+            this.capacity = maxSize;
+            this.distances = new int[maxSize];
+            this.distances[0] = Integer.MIN_VALUE;
+            this.positions = new int[maxSize];
+            for(int i = 0; i < maxSize; i++){
+                this.positions[i] = i + 1;
+            }
+        }
+
+        public boolean isEmpty(){
+            return size == 0;
+        }
+
+        private int parent(int pos) {
+            return pos / 2;
+        }
+
+        private void swap(int pos1, int pos2) {
+            int tmp = distances[pos1];
+            distances[pos1] = distances[pos2];
+            distances[pos2] = tmp;
+            tmp = positions[pos1 - 1];
+            positions[pos1 - 1] = positions[pos2 - 1];
+            positions[pos2 - 1] = tmp;
+        }
+
+        public void insert(int nodeId, int priority){
+            size++;
+            distances[size] = priority;
+            positions[size - 1] = nodeId;
+
+            int current = size;
+            // FILL IN CODE: bubble up if the value of current < value of the parent
+            while(distances[current] < distances[parent(current)]){
+                swap(current, parent(current));
+                current = parent(current);
+            }
+        }
+
+        public void removeMin(){
+            swap(1, size); // swap the end of the heap into the root
+            size--;  	   // removed the end of the heap
+            // fix the heap property - push down as needed
+            if (size != 0)
+                pushdown(1);
+
+        }
+
+        private boolean isLeaf(int pos) {
+            return ((pos > size / 2) && (pos <= size));
+        }
+
+        private int leftChild(int pos) {
+            return 2 * pos;
+        }
+
+        private void pushdown(int position) {
+            int smallestChild;
+            while (!isLeaf(position)) {
+                smallestChild = leftChild(position);
+                if(smallestChild + 1 <= size){
+                    if(distances[smallestChild + 1] < distances[smallestChild]){
+                        smallestChild = smallestChild + 1;
+                    }
+                }
+                if(distances[position] < distances[smallestChild]){
+                    return;
+                }else{
+                    swap(position, smallestChild);
+                }
+                position = smallestChild;
+            }
+        }
+
+        public void reduceKey(int nodeId, int newPriority){
+            distances[nodeId] = newPriority;
+            while(!isLeaf(nodeId)){
+                int leftChildPosition = nodeId * 2;
+                int rightChildePosition = nodeId * 2 + 1;
+                if(rightChildePosition <= size){
+                    if(distances[leftChildPosition] > distances[rightChildePosition]){
+                        if(distances[nodeId] > distances[rightChildePosition]){
+                            swap(nodeId, rightChildePosition);
+                            nodeId = rightChildePosition;
+                        }else{
+                            break;
+                        }
+                    }else{
+                        if(distances[nodeId] > distances[leftChildPosition]){
+                            swap(nodeId, leftChildPosition);
+                            nodeId = leftChildPosition;
+                        }else{
+                            break;
+                        }
+                    }
+                }else{
+                    if(distances[nodeId] > distances[leftChildPosition]){
+                        swap(nodeId, leftChildPosition);
+                        nodeId = leftChildPosition;
+                    }else{
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
     /** Constructor
      *
      * @param filename name of the file that contains info about nodes and edges
@@ -21,6 +139,7 @@ public class Dijkstra {
     public Dijkstra(String filename, Graph graph) {
         this.graph = graph;
         graph.loadGraph(filename);
+        this.dijkstraTable = new int[this.graph.numNodes()][2];
     }
 
     /**
