@@ -19,17 +19,16 @@ public class Dijkstra {
         private int[] positions;
         private int[] distances;
         private int size;
-        private int capacity;
 
         public PriorityQueue(int maxSize){
             this.size = 0;
-            this.capacity = maxSize;
             this.distances = new int[maxSize];
             this.distances[0] = Integer.MIN_VALUE;
             this.positions = new int[maxSize];
             for(int i = 0; i < maxSize; i++){
                 this.positions[i] = i + 1;
             }
+            System.out.println("Good");
         }
 
         public boolean isEmpty(){
@@ -52,7 +51,7 @@ public class Dijkstra {
         public void insert(int nodeId, int priority){
             size++;
             distances[size] = priority;
-            positions[size - 1] = nodeId;
+            //positions[size - 1] = nodeId;
 
             int current = size;
             // FILL IN CODE: bubble up if the value of current < value of the parent
@@ -156,6 +155,11 @@ public class Dijkstra {
 
         // Create and initialize Dijkstra's table
         // Create and initialize a Priority Queue - you need to implement your own, NOT use a built in one!
+        PriorityQueue pq = new PriorityQueue(graph.numNodes() + 1);
+        pq.insert(0, 0);
+        for(int i = 1; i < graph.numNodes(); i++){
+            pq.insert(i, Integer.MAX_VALUE);
+        }
 
         // Run Dijkstra
 
