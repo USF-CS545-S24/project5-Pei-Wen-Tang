@@ -228,14 +228,7 @@ public class Graph {
         return null;
     }
 
-    public int[] getNeighbors(int nodeId){
-        int[] neighbors = new int[this.neighborsCount[nodeId]];
-        Edge curr = this.adjacencyList[nodeId];
-        int i = 0;
-        while(curr != null){
-            neighbors[i++] = curr.getNeighbor();
-            curr = curr.getNext();
-        }
-        return neighbors;
+    public Edge[] getAdjacencyList(){
+        return this.adjacencyList;
     }
 }
