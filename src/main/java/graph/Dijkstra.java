@@ -13,22 +13,30 @@ public class Dijkstra {
     private Graph graph; // stores the graph of CityNode-s and edges connecting them
     private List<Integer> shortestPath = null; // nodes that are part of the shortest path
 
-    private int[][] dijkstraTable;
+    private Pair[] dijkstraTable;  // Pair: (shortest, parent)
 
+    // Inner class for storing data with two elements
+    private static class Pair{
+        Object first;
+        Object second;
+
+        public Pair(Object first, Object second){
+            this.first = first;
+            this.second = second;
+        }
+    }
+
+    // Inner class implementing priority queue for Dijkstra
     private static class PriorityQueue{
         private int[] positions;
-        private int[] distances;
+        private Pair[] heap;
         private int size;
 
         public PriorityQueue(int maxSize){
             this.size = 0;
-            this.distances = new int[maxSize];
-            this.distances[0] = Integer.MIN_VALUE;
-            this.positions = new int[maxSize];
-            for(int i = 0; i < maxSize; i++){
-                this.positions[i] = i + 1;
-            }
-            System.out.println("Good");
+            this.heap = new Pair[maxSize];
+            this.heap[0] = new Pair(-1, Integer.MIN_VALUE);
+            this.positions = new int[maxSize - 1];
         }
 
         public boolean isEmpty(){
@@ -40,34 +48,36 @@ public class Dijkstra {
         }
 
         private void swap(int pos1, int pos2) {
-            int tmp = distances[pos1];
-            distances[pos1] = distances[pos2];
-            distances[pos2] = tmp;
-            tmp = positions[pos1 - 1];
+            Pair tmp = heap[pos1];
+            heap[pos1] = heap[pos2];
+            heap[pos2] = tmp;
+            int positionTmp = positions[pos1 - 1];
             positions[pos1 - 1] = positions[pos2 - 1];
-            positions[pos2 - 1] = tmp;
+            positions[pos2 - 1] = positionTmp;
         }
 
         public void insert(int nodeId, int priority){
             size++;
-            distances[size] = priority;
-            //positions[size - 1] = nodeId;
+            heap[size] = new Pair(nodeId, priority);
+            positions[size - 1] = nodeId + 1;
 
             int current = size;
             // FILL IN CODE: bubble up if the value of current < value of the parent
-            while(distances[current] < distances[parent(current)]){
+            while((int)heap[current].second < (int)heap[parent(current)].second){
                 swap(current, parent(current));
                 current = parent(current);
             }
         }
 
-        public void removeMin(){
+        public int removeMin(){
             swap(1, size); // swap the end of the heap into the root
             size--;  	   // removed the end of the heap
             // fix the heap property - push down as needed
-            if (size != 0)
+            if (size != 0) {
                 pushdown(1);
+            }
 
+            return (int)heap[size + 1].first;
         }
 
         private boolean isLeaf(int pos) {
@@ -83,11 +93,11 @@ public class Dijkstra {
             while (!isLeaf(position)) {
                 smallestChild = leftChild(position);
                 if(smallestChild + 1 <= size){
-                    if(distances[smallestChild + 1] < distances[smallestChild]){
+                    if((int)heap[smallestChild + 1].second < (int)heap[smallestChild].second){
                         smallestChild = smallestChild + 1;
                     }
                 }
-                if(distances[position] < distances[smallestChild]){
+                if((int)heap[position].second <= (int)heap[smallestChild].second){
                     return;
                 }else{
                     swap(position, smallestChild);
@@ -97,20 +107,20 @@ public class Dijkstra {
         }
 
         public void reduceKey(int nodeId, int newPriority){
-            distances[nodeId] = newPriority;
+            heap[nodeId] = new Pair(nodeId, newPriority);
             while(!isLeaf(nodeId)){
                 int leftChildPosition = nodeId * 2;
                 int rightChildePosition = nodeId * 2 + 1;
                 if(rightChildePosition <= size){
-                    if(distances[leftChildPosition] > distances[rightChildePosition]){
-                        if(distances[nodeId] > distances[rightChildePosition]){
+                    if((int)heap[leftChildPosition].second > (int)heap[rightChildePosition].second){
+                        if((int)heap[nodeId].second > (int)heap[rightChildePosition].second){
                             swap(nodeId, rightChildePosition);
                             nodeId = rightChildePosition;
                         }else{
                             break;
                         }
                     }else{
-                        if(distances[nodeId] > distances[leftChildPosition]){
+                        if((int)heap[nodeId].second > (int)heap[leftChildPosition].second){
                             swap(nodeId, leftChildPosition);
                             nodeId = leftChildPosition;
                         }else{
@@ -118,7 +128,7 @@ public class Dijkstra {
                         }
                     }
                 }else{
-                    if(distances[nodeId] > distances[leftChildPosition]){
+                    if((int)heap[nodeId].second > (int)heap[leftChildPosition].second){
                         swap(nodeId, leftChildPosition);
                         nodeId = leftChildPosition;
                     }else{
@@ -138,7 +148,10 @@ public class Dijkstra {
     public Dijkstra(String filename, Graph graph) {
         this.graph = graph;
         graph.loadGraph(filename);
-        this.dijkstraTable = new int[this.graph.numNodes()][2];
+        this.dijkstraTable = new Pair[this.graph.numNodes()];
+        for(int i = 1; i < this.graph.numNodes(); i++){
+            this.dijkstraTable[i] = new Pair(-1, Integer.MAX_VALUE);
+        }
     }
 
     /**
@@ -162,7 +175,14 @@ public class Dijkstra {
         }
 
         // Run Dijkstra
+        ;
+        while(!pq.isEmpty()){
+            int currNodeId = pq.removeMin();
+            int[] neighbors = graph.getNeighbors(currNodeId);
+            for(int neighbor: neighbors){
 
+            }
+        }
         // Compute the nodes on the shortest path by "backtracking" using the table
 
         // The result should be in an instance variable called "shortestPath" and
