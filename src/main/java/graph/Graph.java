@@ -22,6 +22,7 @@ public class Graph {
     private CityNode[] nodes; // array of nodes of the graph
     private Edge[] adjacencyList; // adjacency list; for each vertex stores a linked list of edges
     private Map<String, Integer> labelsToIndices; // a HashMap that maps each city to the corresponding node id
+    private int[] neighborsCount;
 
     /**
      * Read graph info from the given file, and create nodes and edges of
@@ -42,6 +43,7 @@ public class Graph {
             }
             this.numNodes = Integer.parseInt(br.readLine());
             this.nodes = new CityNode[this.numNodes];
+            this.neighborsCount = new int[this.numNodes];
             for(int i = 0; i < this.numNodes; i++){
                 line = br.readLine();
                 String[] strs = line.split(" ");
@@ -105,6 +107,7 @@ public class Graph {
             edge.setNext(this.adjacencyList[nodeId]);
             this.adjacencyList[nodeId] = edge;
         }
+        this.neighborsCount[nodeId]++;
     }
 
     /**
@@ -225,4 +228,14 @@ public class Graph {
         return null;
     }
 
+    public int[] getNeighbors(int nodeId){
+        int[] neighbors = new int[this.neighborsCount[nodeId]];
+        Edge curr = this.adjacencyList[nodeId];
+        int i = 0;
+        while(curr != null){
+            neighbors[i++] = curr.getNeighbor();
+            curr = curr.getNext();
+        }
+        return neighbors;
+    }
 }
